@@ -1,0 +1,10 @@
+---
+# Setup bash
+- name: Add AWS CLI deps
+  apt: name=python-pip state=present update_cache=yes
+
+- name: Install pip and aws cli
+  shell: /usr/bin/python -m pip install --upgrade {{ item }}
+  with_items:
+    - pip
+    - awscli

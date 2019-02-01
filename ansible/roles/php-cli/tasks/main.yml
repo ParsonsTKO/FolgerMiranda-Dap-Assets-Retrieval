@@ -1,0 +1,19 @@
+---
+- shell: echo $LANG
+  environment:
+   LANG: "en_US.UTF-8"
+
+- name: 'Add php7.2 ppa'
+  apt_repository: repo='ppa:ondrej/php' state=present
+
+- name: 'Update APT'
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: Install php7.2-cli and deps
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+    - php7.2
+    - php7.2-curl
+    - php7.2-zip
+    - php7.2-xml
+    - php

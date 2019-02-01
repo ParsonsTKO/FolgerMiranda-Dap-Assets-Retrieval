@@ -1,0 +1,10 @@
+.idea
+.vagrant
+cache/*
+!cache/.gitkeep
+images
+.env
+etc
+vendor
+ansible
+Vagrantfile

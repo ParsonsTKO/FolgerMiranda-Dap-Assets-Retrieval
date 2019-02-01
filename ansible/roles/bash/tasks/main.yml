@@ -1,0 +1,20 @@
+---
+# Setup bash
+- name: Place a ~/.bash_profile
+  template:
+    src: templates/.bash_profile
+    dest: "/home/vagrant/.bash_profile"
+  become_user: vagrant
+
+- name: Place a ~/.bash.d/
+  file:
+    path: "/home/vagrant/.bash.d"
+    state: directory
+  become_user: vagrant
+
+# start each session in /vagrant
+- name: Place a ~/.bash.d/cd-vagrant.sh
+  template:
+    src: templates/cd-vagrant.sh
+    dest: "/home/vagrant/.bash.d/cd-vagrant.sh"
+  become_user: vagrant

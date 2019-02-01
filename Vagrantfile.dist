@@ -1,0 +1,42 @@
+# _-*- mode: ruby -*-
+# vi: set ft=ruby
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.require_version(">= 1.8.0")
+
+unless Vagrant.has_plugin?("vagrant-hostmanager")
+    system("vagrant plugin install vagrant-hostmanager")
+    puts "vagrant-hostmanager installed, please try the command again"
+    exit
+end
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+    config.vm.box = "geerlingguy/ubuntu1604"
+    config.vm.network "private_network", ip: "33.33.33.158"
+
+    config.ssh.insert_key = true
+    config.ssh.forward_agent = true
+
+    config.vm.synced_folder ".", "/vagrant", :nfs => true
+
+    config.vm.provider "virtualbox" do |v|
+        v.name = "dap-asset-retrieval"
+
+        v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        v.customize ["modifyvm", :id, "--memory", "2048"]
+        v.customize ["modifyvm", :id, "--cpus", "2"]
+    end
+
+    config.vm.box_check_update = true
+
+    config.vm.provision "ansible_local" do |ansible|
+        ansible.playbook = "ansible/playbook.yml"
+        ansible.groups = {
+            "dap-asset-retrieval" => ["default"]
+        }
+        ansible.become = true
+    end
+
+end
+

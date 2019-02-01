@@ -1,0 +1,10 @@
+---
+- name: Install PHP CLI
+  hosts: dap-asset-retrieval
+  become_method: sudo
+
+  roles:
+    - php-cli
+    - bash
+    - composer
+    - awscli

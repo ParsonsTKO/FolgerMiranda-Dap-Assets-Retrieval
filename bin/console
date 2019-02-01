@@ -1,0 +1,35 @@
+#!/usr/bin/env php
+<?php
+
+use App\Application;
+use App\Command\RetrieveAssetsCommand;
+use App\Container\Container;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Debug\Debug;
+use Symfony\Component\Dotenv\Dotenv;
+
+set_time_limit(0);
+
+require __DIR__.'/../vendor/autoload.php';
+
+if (!isset($_SERVER['APP_ENV'])) {
+    (new Dotenv())->load(__DIR__ . '/../.env');
+}
+
+$env = $_SERVER['APP_ENV'] ?? 'dev';
+$debug = $_SERVER['APP_DEBUG'] ?? ('prod' !== $env);
+
+if ($debug && class_exists(Debug::class)) {
+    Debug::enable();
+}
+
+$container = new Container($env);
+$container->build();
+
+$application = new Application();
+$application->add($container->get(RetrieveAssetsCommand::class));
+$application->run(new ArrayInput([
+    'command'   => 'assets:retrieve',
+    '--debug'   => (bool) ($_SERVER['DEBUG'] ?? false),
+    '--replace' => (bool) ($_SERVER['RETRIEVAL_REPLACE'] ?? false),
+]));

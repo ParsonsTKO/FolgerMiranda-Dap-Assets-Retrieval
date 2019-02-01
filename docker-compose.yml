@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  app:
+    container_name: dapassetsretrieval-app
+    hostname: app
+    build:
+      context: .
+      dockerfile: etc/docker/app/Dockerfile
+    image: folgerdap/assetsretrieval/app
+    working_dir: /app
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+      - ./composer.json:/app/composer.json
+      - ./:/tmp/app
+    environment:
+      - APP_DEBUG=1
+      - APP_ENV=dev
+      - SQS_PROFILE=default
+      - SQS_REGION=us-east-2
+      - S3_REGION=us-east-2
+      - S3_DESTINATION_NAME=folgerdap-assets-staging
+      - SQS_QUEUE_URL=https://sqs.us-east-2.amazonaws.com/000000000000/queue

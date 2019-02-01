@@ -1,0 +1,50 @@
+parameters:
+    env(SQS_PROFILE): ~
+    env(SQS_REGION): ~
+    env(S3_REGION): ~
+    env(S3_PROFILE): ~
+    env(SQS_QUEUE_URL): ~
+    env(SQS_WAIT_TIME): 20
+    env(MAXIMUM_RUNTIME): ~
+    env(DESTINATION): /imageroot
+    env(CONSTANT_WAIT_TIME): 0
+    env(S3_DESTINATION_NAME): ~
+    env(TMP_COPY_S3): /tmp
+
+services:
+    _defaults:
+        autowire: true
+
+    App\AWS\InstanceIdProvider: ~
+    App\AWS\SqsClient:
+        arguments:
+            $waitTime: '%env(SQS_WAIT_TIME)%'
+            $region: '%env(SQS_REGION)%'
+            $queueUrl: '%env(SQS_QUEUE_URL)%'
+            $profile: '%env(SQS_PROFILE)%'
+    App\AWS\S3Client:
+        arguments:
+            $region: '%env(S3_REGION)%'
+            $destinationBucket: '%env(S3_DESTINATION_NAME)%'
+            $profile: '%env(S3_PROFILE)%'
+
+    App\Command\RetrieveAssetsCommand:
+        arguments:
+            $maximumRuntime: '%env(MAXIMUM_RUNTIME)%'
+        public: true
+
+    App\Retriever\DefaultRetriever:
+        arguments:
+            $destinationDirectory: '%env(DESTINATION)%'
+    App\Retriever\RetrieverInterface: '@App\Retriever\DefaultRetriever'
+
+    App\Retriever\S3Retriever:
+        arguments:
+            $tmpCopyToS3: '%env(TMP_COPY_S3)%'
+    App\Retriever\S3RetrieverInterface: '@App\Retriever\S3Retriever'
+
+    App\WaitStrategy\ConstantWaitStrategy:
+        arguments:
+            $wait: '%env(CONSTANT_WAIT_TIME)%'
+
+    App\WaitStrategy\WaitStrategyInterface: '@App\WaitStrategy\ConstantWaitStrategy'
